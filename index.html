@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a1a2e">
+<title>Mariana — Finanças</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #1D9E75;
+  --green-light: #e8f7f2;
+  --red: #D85A30;
+  --red-light: #fdf0ec;
+  --blue: #2563EB;
+  --bg: #f7f6f3;
+  --card: #ffffff;
+  --text: #1a1a1a;
+  --muted: #888;
+  --border: #e8e8e8;
+  --accent: #1a1a2e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+}
+
+/* HEADER */
+.header {
+  background: var(--accent);
+  color: #fff;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+.header-title span {
+  font-style: italic;
+  color: #7dd3b8;
+}
+.header-sub {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-top: 1px;
+}
+.header-btn {
+  background: rgba(255,255,255,.1);
+  border: none;
+  color: #fff;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.header-btn:hover { background: rgba(255,255,255,.2); }
+
+/* TABS */
+.tabs {
+  display: flex;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 60px;
+  z-index: 99;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 1;
+  min-width: 70px;
+  padding: 12px 8px 10px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  transition: color .15s;
+}
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+
+/* VIEWS */
+.view { display: none; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 32px; }
+.view.active { display: block; }
+
+/* CARDS */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+/* METRICS */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.metric {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 12px 10px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.metric-label { font-size: 10px; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px; }
+.metric-value { font-size: 14px; font-weight: 600; line-height: 1.2; }
+.v-green { color: var(--green); }
+.v-red   { color: var(--red); }
+
+/* BARS */
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.bar-label { font-size: 12px; color: var(--muted); width: 105px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-track { flex: 1; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 4px; transition: width .5s ease; }
+.bar-val   { font-size: 11px; color: var(--muted); width: 72px; text-align: right; flex-shrink: 0; }
+
+/* TX ITEMS */
+.tx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+.tx-item:last-child { border-bottom: none; padding-bottom: 0; }
+.tx-dot {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; flex-shrink: 0;
+}
+.tx-info { flex: 1; min-width: 0; }
+.tx-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.tx-amt  { font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.tx-del  {
+  background: none; border: none; cursor: pointer;
+  color: #ddd; font-size: 16px; padding: 4px 6px;
+  transition: color .15s;
+}
+.tx-del:hover { color: var(--red); }
+
+/* FORMS */
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 500; }
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--card);
+  outline: none;
+  transition: border-color .15s;
+}
+.form-group input:focus,
+.form-group select:focus { border-color: var(--green); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* TYPE TOGGLE */
+.type-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+.type-opt {
+  flex: 1; padding: 11px; border-radius: 12px;
+  border: 1.5px solid var(--border);
+  text-align: center; font-size: 14px; font-weight: 500;
+  cursor: pointer; background: none; color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+.type-opt.exp.active { background: var(--red-light); border-color: var(--red); color: var(--red); }
+.type-opt.inc.active { background: var(--green-light); border-color: var(--green); color: var(--green); }
+
+/* BUTTONS */
+.btn-primary {
+  width: 100%; padding: 14px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 500;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: opacity .15s; margin-top: 4px;
+}
+.btn-primary:hover { opacity: .85; }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+.btn-green  { background: var(--green); }
+.btn-outline {
+  padding: 11px; border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: none; font-size: 14px;
+  cursor: pointer; color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  transition: background .15s;
+}
+.btn-outline:hover { background: var(--bg); }
+
+/* UPLOAD ZONE */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  padding: 32px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+  position: relative;
+}
+.upload-zone:hover { border-color: var(--green); background: var(--green-light); }
+.upload-zone input {
+  position: absolute; inset: 0; opacity: 0;
+  cursor: pointer; width: 100%; height: 100%;
+}
+.upload-icon { font-size: 36px; display: block; margin-bottom: 10px; }
+.upload-txt  { font-size: 15px; color: var(--muted); margin-bottom: 4px; }
+.upload-sub  { font-size: 12px; color: #bbb; }
+
+/* PREVIEW */
+.preview-img {
+  width: 100%; max-height: 240px; object-fit: contain;
+  border-radius: 12px; border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.preview-actions { display: flex; gap: 10px; }
+
+/* AI BADGE */
+.ai-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--green-light); color: var(--green);
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 500; margin-bottom: 14px;
+}
+
+/* RESUMO BOX */
+.resumo-box {
+  background: var(--bg); border-radius: 10px;
+  padding: 12px 14px; font-size: 13px;
+  color: var(--muted); font-style: italic;
+  margin-bottom: 14px; line-height: 1.5;
+}
+
+/* ITEMS TABLE */
+.items-table { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 4px; }
+.items-header, .items-row { display: grid; grid-template-columns: 1fr 40px 80px 80px; gap: 6px; padding: 8px 12px; align-items: center; }
+.items-header { background: var(--bg); font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+.items-row { border-top: 1px solid #f5f5f5; font-size: 12px; }
+.items-row:hover { background: #fafafa; }
+.items-row .desc { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.items-row .num  { text-align: right; color: var(--muted); }
+.items-row .num.total { color: var(--text); font-weight: 500; }
+
+/* SPINNER */
+.spinner {
+  display: inline-block; width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin .6s linear infinite; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* MONTH SELECT */
+.month-select {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid var(--border); border-radius: 10px;
+  font-size: 14px; font-family: 'DM Sans', sans-serif;
+  color: var(--text); background: var(--card);
+  margin-bottom: 14px; outline: none;
+}
+
+/* FILTER ROW */
+.filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.filter-row select { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--card); outline: none; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 48px 16px; color: var(--muted); }
+.empty-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+
+/* CONFIG */
+.config-section { margin-bottom: 20px; }
+.config-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+.config-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+.steps-list { list-style: none; }
+.steps-list li {
+  display: flex; gap: 12px; align-items: flex-start;
+  margin-bottom: 10px; font-size: 13px; color: #444; line-height: 1.6;
+}
+.step-n {
+  min-width: 24px; height: 24px; border-radius: 50%;
+  background: var(--green); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+.link-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--blue); font-size: 13px; text-decoration: none; font-weight: 500;
+}
+.link-btn:hover { text-decoration: underline; }
+.saved-badge { color: var(--green); font-size: 13px; margin-top: 8px; }
+.key-hint { font-size: 12px; margin-top: 4px; margin-bottom: 10px; }
+
+/* LOGIN MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(26,26,46,.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; padding: 24px;
+}
+.modal-box {
+  background: var(--card); border-radius: 20px;
+  padding: 28px 24px; width: 100%; max-width: 360px;
+}
+.modal-title {
+  font-family: 'DM Serif Display', serif; font-size: 24px;
+  margin-bottom: 6px;
+}
+.modal-title span { font-style: italic; color: var(--green); }
+.modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+.modal-error { color: var(--red); font-size: 13px; margin-bottom: 10px; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #fff;
+  padding: 10px 22px; border-radius: 24px;
+  font-size: 13px; z-index: 999; opacity: 0;
+  transition: opacity .3s; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+/* MONTH BADGE */
+.summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 2px; }
+.summary-count { font-size: 12px; color: var(--muted); }
+.summary-nums  { display: flex; gap: 12px; }
+.summary-nums span { font-size: 12px; font-weight: 500; }
+
+/* OBS BOX */
+.obs-box { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--muted); font-style: italic; line-height: 1.6; }
+
+@media (min-width: 480px) {
+  .metric-value { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal-box">
+    <p class="modal-title">Olá, <span>Mariana</span> 👋</p>
+    <p class="modal-sub">Entre com sua senha para acessar suas finanças</p>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" id="login-pw" placeholder="Digite sua senha" autocomplete="current-password">
+    </div>
+    <p class="modal-error" id="login-error" style="display:none">Senha incorreta. Tente novamente.</p>
+    <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    <p style="font-size:12px;color:var(--muted);margin-top:12px;text-align:center">Primeira vez? A senha padrão é <strong>mariana123</strong><br>Você pode mudar nas Configurações</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div>
+    <div class="header-title">Mari<span>ana</span></div>
+    <div class="header-sub">finanças pessoais</div>
+  </div>
+  <button class="header-btn" onclick="doLogout()">Sair</button>
+</header>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tab active" onclick="showTab('painel')" id="tab-painel">
+    <span class="tab-icon">📊</span>Painel
+  </button>
+  <button class="tab" onclick="showTab('nota')" id="tab-nota">
+    <span class="tab-icon">📷</span>Ler nota
+  </button>
+  <button class="tab" onclick="showTab('lancar')" id="tab-lancar">
+    <span class="tab-icon">➕</span>Lançar
+  </button>
+  <button class="tab" onclick="showTab('historico')" id="tab-historico">
+    <span class="tab-icon">📋</span>Histórico
+  </button>
+  <button class="tab" onclick="showTab('config')" id="tab-config">
+    <span class="tab-icon">⚙️</span>Config
+  </button>
+</nav>
+
+<!-- ===== PAINEL ===== -->
+<div class="view active" id="view-painel">
+  <select class="month-select" id="p-month" onchange="renderPainel()"></select>
+  <div class="metric-grid" id="p-metrics"></div>
+  <div class="card" id="p-bars-card" style="display:none">
+    <p class="card-title">Gastos por categoria</p>
+    <div id="p-bars"></div>
+  </div>
+  <div class="card" id="p-recent-card" style="display:none">
+    <p class="card-title">Últimos lançamentos</p>
+    <div id="p-recent"></div>
+  </div>
+  <div class="empty" id="p-empty" style="display:none">
+    <span class="empty-icon">📭</span>
+    Nenhum lançamento neste mês
+  </div>
+</div>
+
+<!-- ===== LER NOTA ===== -->
+<div class="view" id="view-nota">
+  <div class="card" id="nota-upload-card">
+    <p class="card-title">Escolha a imagem da nota</p>
+    <div class="upload-zone" id="nota-drop">
+      <input type="file" accept="image/*" id="nota-file" onchange="onNotaFile(event)">
+      <span class="upload-icon">📸</span>
+      <p class="upload-txt">Toque para tirar foto ou escolher imagem</p>
+      <p class="upload-sub">Cupom fiscal, nota de mercado, recibo...</p>
+    </div>
+  </div>
+
+  <div class="card" id="nota-preview-card" style="display:none">
+    <img id="nota-img" class="preview-img" alt="Nota fiscal">
+    <div class="preview-actions">
+      <button class="btn-outline" onclick="resetNota()" style="flex:1">Trocar</button>
+      <button class="btn-primary" id="nota-read-btn" onclick="readNota()" style="flex:2;margin-top:0">✨ Ler com IA</button>
+    </div>
+  </div>
+
+  <div class="card" id="nota-form-card" style="display:none">
+    <div class="ai-badge">✅ Nota lida — revise e salve</div>
+    <div class="resumo-box" id="nota-resumo"></div>
+
+    <div class="type-toggle">
+      <button class="type-opt exp active" id="nt-exp" onclick="setNType('expense')">↑ Saída</button>
+      <button class="type-opt inc" id="nt-inc" onclick="setNType('income')">↓ Entrada</button>
+    </div>
+
+    <div class="form-group">
+      <label>Estabelecimento</label>
+      <input type="text" id="n-desc">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="n-date">
+      </div>
+      <div class="form-group">
+        <label>Valor total (R$)</label>
+        <input type="number" id="n-total" step="0.01">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="n-cat"></select>
+      </div>
+      <div class="form-group">
+        <label>Pagamento</label>
+        <select id="n-pay">
+          <option>Dinheiro</option><option>Cartão de crédito</option>
+          <option>Cartão de débito</option><option>PIX</option><option>Transferência</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="n-items-section" style="display:none">
+      <p class="card-title" id="n-items-title">Itens da nota</p>
+      <div class="items-table">
+        <div class="items-header"><div>Descrição</div><div style="text-align:right">Qtd</div><div style="text-align:right">Unit.</div><div style="text-align:right">Total</div></div>
+        <div id="n-items-body"></div>
+      </div>
+    </div>
+
+    <div id="n-obs-section" class="form-group" style="display:none;margin-top:14px">
+      <label>Observações</label>
+      <div class="obs-box" id="n-obs-text"></div>
+    </div>
+
+    <button class="btn-primary btn-green" onclick="saveNota()" style="margin-top:16px">💾 Salvar lançamento</button>
+  </div>
+</div>
+
+<!-- ===== LANÇAR ===== -->
+<div class="view" id="view-lancar">
+  <div class="card">
+    <div class="type-toggle">
+      <button class="type-opt exp active" id="lt-exp" onclick="setLType('expense')">↑ Saída</button>
+      <button class="type-opt inc" id="lt-inc" onclick="setLType('income')">↓ Entrada</button>
+    </div>
+    <div class="form-group">
+      <label>Descrição *</label>
+      <input type="text" id="l-desc" placeholder="Ex: Mercado, Salário...">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Valor R$ *</label>
+        <input type="number" id="l-amt" step="0.01" placeholder="0,00">
+      </div>
+      <div class="form-group">
+        <label>Data *</label>
+        <input type="date" id="l-date">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="l-cat"></select>
+      </div>
+      <div class="form-group">
+        <label>Pagamento</label>
+        <select id="l-pay">
+          <option>Dinheiro</option><option>Cartão de crédito</option>
+          <option>Cartão de débito</option><option>PIX</option><option>Transferência</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary btn-green" onclick="saveLancar()">Salvar lançamento</button>
+  </div>
+</div>
+
+<!-- ===== HISTÓRICO ===== -->
+<div class="view" id="view-historico">
+  <div class="filter-row">
+    <select id="h-month" onchange="renderHistorico()"></select>
+    <select id="h-type" onchange="renderHistorico()">
+      <option value="">Todos</option>
+      <option value="expense">Saídas</option>
+      <option value="income">Entradas</option>
+    </select>
+  </div>
+  <div id="h-summary" class="summary-row" style="display:none"></div>
+  <div id="h-list"></div>
+</div>
+
+<!-- ===== CONFIG ===== -->
+<div class="view" id="view-config">
+  <div class="card">
+    <p class="config-title">🔑 Chave da API Gemini (gratuita)</p>
+    <p class="config-desc">Para usar a leitura de notas fiscais com IA, você precisa de uma chave gratuita do Google Gemini.</p>
+    <ul class="steps-list">
+      <li><div class="step-n">1</div><div>Acesse <a href="https://aistudio.google.com" target="_blank" class="link-btn">aistudio.google.com ↗</a></div></li>
+      <li><div class="step-n">2</div><div>Entre com sua conta Google</div></li>
+      <li><div class="step-n">3</div><div>Clique em <strong>Get API Key</strong> → <strong>Create API key</strong></div></li>
+      <li><div class="step-n">4</div><div>Copie a chave e cole abaixo</div></li>
+    </ul>
+    <div class="form-group" style="margin-top:14px">
+      <label>Sua chave Gemini (AIza...)</label>
+      <input type="password" id="cfg-apikey" placeholder="AIzaSy...">
+      <p class="key-hint" id="cfg-key-hint"></p>
+    </div>
+    <button class="btn-primary" onclick="saveApiKey()">Salvar chave</button>
+    <p class="saved-badge" id="cfg-saved" style="display:none">✓ Chave salva!</p>
+  </div>
+
+  <div class="card">
+    <p class="config-title">🔒 Alterar senha</p>
+    <div class="form-group">
+      <label>Senha atual</label>
+      <input type="password" id="cfg-pw-old" placeholder="">
+    </div>
+    <div class="form-group">
+      <label>Nova senha</label>
+      <input type="password" id="cfg-pw-new" placeholder="Mínimo 4 caracteres">
+    </div>
+    <button class="btn-primary" onclick="changePassword()">Alterar senha</button>
+  </div>
+
+  <div class="card">
+    <p class="config-title">📤 Exportar dados</p>
+    <p class="config-desc" style="margin-bottom:10px">Baixe todos os seus lançamentos em formato CSV (Excel).</p>
+    <button class="btn-primary" onclick="exportCSV()">Baixar CSV</button>
+  </div>
+
+  <div class="card" style="border-color:#ffe4e1">
+    <p class="config-title" style="color:var(--red)">⚠️ Apagar todos os dados</p>
+    <p class="config-desc">Isso remove todos os lançamentos permanentemente.</p>
+    <button class="btn-primary" style="background:var(--red)" onclick="clearData()">Apagar tudo</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONSTANTS
+// ============================================================
+const CATS_E = ['Mercado','Restaurante','Farmácia','Padaria','Aluguel','Água/Luz/Gás','Internet/Telefone','Transporte','Saúde','Educação','Roupas','Lazer','Outros'];
+const CATS_I = ['Salário','Freelance','Aluguel recebido','Presente','Outros'];
+const CAT_C  = {'Mercado':'#1D9E75','Restaurante':'#D85A30','Farmácia':'#E24B4A','Padaria':'#EF9F27','Aluguel':'#378ADD','Água/Luz/Gás':'#EF9F27','Internet/Telefone':'#D4537E','Transporte':'#0F6E56','Saúde':'#E24B4A','Educação':'#7F77DD','Roupas':'#BA7517','Lazer':'#185FA5','Salário':'#1D9E75','Freelance':'#7F77DD','Aluguel recebido':'#378ADD','Presente':'#D4537E','Outros':'#888780'};
+const CAT_EMOJI = {'Mercado':'🛒','Restaurante':'🍽️','Farmácia':'💊','Padaria':'🥐','Aluguel':'🏠','Água/Luz/Gás':'💧','Internet/Telefone':'📶','Transporte':'🚗','Saúde':'❤️','Educação':'📚','Roupas':'👗','Lazer':'🎮','Salário':'💼','Freelance':'💻','Aluguel recebido':'🏢','Presente':'🎁','Outros':'📌'};
+
+// ============================================================
+// STORAGE & STATE
+// ============================================================
+let txs = [], lType = 'expense', nType = 'expense', currentB64 = null, notaItems = [];
+
+function load()  { try { txs = JSON.parse(localStorage.getItem('mari_txs_v1') || '[]'); } catch { txs = []; } }
+function persist(){ localStorage.setItem('mari_txs_v1', JSON.stringify(txs)); }
+function fmt(v)  { return 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function monthOpts() {
+  const ms = new Set();
+  const n = new Date();
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(n.getFullYear(), n.getMonth()-i, 1);
+    ms.add(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));
+  }
+  txs.forEach(t => ms.add(t.date.substring(0,7)));
+  return [...ms].sort().reverse();
+}
+function monthLabel(m) {
+  const [y,mo] = m.split('-');
+  const l = new Date(y,mo-1,1).toLocaleString('pt-BR',{month:'long',year:'numeric'});
+  return l.charAt(0).toUpperCase()+l.slice(1);
+}
+function fillMonths() {
+  const opts = monthOpts();
+  ['p-month','h-month'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    const cur = el.value;
+    el.innerHTML = opts.map(m=>`<option value="${m}">${monthLabel(m)}</option>`).join('');
+    if (cur && opts.includes(cur)) el.value = cur;
+  });
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+const DEFAULT_PW = 'mariana123';
+function getStoredPw() { return localStorage.getItem('mari_pw') || DEFAULT_PW; }
+function isLoggedIn()  { return sessionStorage.getItem('mari_logged') === '1'; }
+
+function checkAuth() {
+  document.getElementById('login-modal').style.display = isLoggedIn() ? 'none' : 'flex';
+}
+function doLogin() {
+  const pw = document.getElementById('login-pw').value;
+  if (pw === getStoredPw()) {
+    sessionStorage.setItem('mari_logged','1');
+    document.getElementById('login-modal').style.display = 'none';
+    document.getElementById('login-error').style.display = 'none';
+    init();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+function doLogout() {
+  if (!confirm('Sair da conta?')) return;
+  sessionStorage.removeItem('mari_logged');
+  document.getElementById('login-pw').value = '';
+  document.getElementById('login-modal').style.display = 'flex';
+}
+document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function changePassword() {
+  const old = document.getElementById('cfg-pw-old').value;
+  const nw  = document.getElementById('cfg-pw-new').value;
+  if (old !== getStoredPw()) { showToast('Senha atual incorreta'); return; }
+  if (nw.length < 4) { showToast('A nova senha precisa ter pelo menos 4 caracteres'); return; }
+  localStorage.setItem('mari_pw', nw);
+  document.getElementById('cfg-pw-old').value = '';
+  document.getElementById('cfg-pw-new').value = '';
+  showToast('✅ Senha alterada com sucesso!');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function showTab(name) {
+  ['painel','nota','lancar','historico','config'].forEach(n => {
+    document.getElementById('view-'+n).classList.toggle('active', n===name);
+    document.getElementById('tab-'+n).classList.toggle('active', n===name);
+  });
+  if (name==='painel')   renderPainel();
+  if (name==='historico')renderHistorico();
+  if (name==='config')   loadConfigScreen();
+}
+
+// ============================================================
+// PAINEL
+// ============================================================
+function renderPainel() {
+  const m   = document.getElementById('p-month').value;
+  const mt  = txs.filter(t => t.date.substring(0,7) === m);
+  const inc = mt.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp = mt.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const bal = inc - exp;
+
+  document.getElementById('p-metrics').innerHTML = `
+    <div class="metric"><p class="metric-label">Entradas</p><p class="metric-value v-green">${fmt(inc)}</p></div>
+    <div class="metric"><p class="metric-label">Saídas</p><p class="metric-value v-red">${fmt(exp)}</p></div>
+    <div class="metric"><p class="metric-label">Saldo</p><p class="metric-value" style="color:${bal>=0?'var(--green)':'var(--red)'}">${(bal<0?'- ':'')}${fmt(bal)}</p></div>
+  `;
+
+  const catMap = {};
+  mt.filter(t=>t.type==='expense').forEach(t => { catMap[t.category]=(catMap[t.category]||0)+t.amount; });
+  const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const maxV = cats.length ? cats[0][1] : 1;
+
+  const barsCard = document.getElementById('p-bars-card');
+  if (cats.length) {
+    barsCard.style.display = '';
+    document.getElementById('p-bars').innerHTML = cats.map(([c,v])=>`
+      <div class="bar-row">
+        <span class="bar-label">${CAT_EMOJI[c]||'•'} ${c}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${(v/maxV*100).toFixed(1)}%;background:${CAT_C[c]||'#888'}"></div></div>
+        <span class="bar-val">${fmt(v)}</span>
+      </div>
+    `).join('');
+  } else { barsCard.style.display = 'none'; }
+
+  const recent = [...mt].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const recentCard = document.getElementById('p-recent-card');
+  if (recent.length) {
+    recentCard.style.display = '';
+    document.getElementById('p-recent').innerHTML = recent.map(txHTML).join('');
+  } else { recentCard.style.display = 'none'; }
+
+  document.getElementById('p-empty').style.display = mt.length ? 'none' : '';
+}
+
+function txHTML(t, showDel=false) {
+  const d = new Date(t.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+  const color = CAT_C[t.category]||'#888';
+  const emoji = CAT_EMOJI[t.category]||'📌';
+  return `<div class="tx-item">
+    <div class="tx-dot" style="background:${color}22">${emoji}</div>
+    <div class="tx-info">
+      <div class="tx-name">${t.description}</div>
+      <div class="tx-meta">${t.category} · ${d} · ${t.payment}${t.items&&t.items.length?' · '+t.items.length+' itens':''}</div>
+    </div>
+    <span class="tx-amt" style="color:${t.type==='income'?'var(--green)':'var(--red)'}">
+      ${t.type==='income'?'+':'-'}${fmt(t.amount)}
+    </span>
+    ${showDel ? `<button class="tx-del" onclick="delTx('${t.id}')" title="Remover">✕</button>` : ''}
+  </div>`;
+}
+
+function delTx(id) {
+  if (!confirm('Remover este lançamento?')) return;
+  txs = txs.filter(t=>t.id!==id); persist(); fillMonths(); renderHistorico(); renderPainel();
+  showToast('Lançamento removido');
+}
+
+// ============================================================
+// LER NOTA
+// ============================================================
+function onNotaFile(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    currentB64 = ev.target.result.split(',')[1];
+    document.getElementById('nota-img').src = ev.target.result;
+    document.getElementById('nota-upload-card').style.display = 'none';
+    document.getElementById('nota-preview-card').style.display = '';
+    document.getElementById('nota-form-card').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetNota() {
+  currentB64 = null;
+  document.getElementById('nota-file').value = '';
+  document.getElementById('nota-upload-card').style.display = '';
+  document.getElementById('nota-preview-card').style.display = 'none';
+  document.getElementById('nota-form-card').style.display = 'none';
+}
+
+async function readNota() {
+  if (!currentB64) return;
+  const apiKey = localStorage.getItem('mari_apikey') || '';
+  if (!apiKey) {
+    alert('⚠️ Configure sua chave da API Gemini primeiro!\nVá na aba "Config" e insira a chave.'); return;
+  }
+  const btn = document.getElementById('nota-read-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Lendo...';
+  try {
+    const prompt = `Leia esta nota fiscal/cupom/recibo. Responda SOMENTE JSON válido sem markdown:\n{"estabelecimento":"","data":"YYYY-MM-DD","total":0.00,"forma_pagamento":"Dinheiro","categoria_sugerida":"Mercado","itens":[{"desc":"","qty":1,"unit":0.00}],"observacoes":"","resumo":"resumo em 1 linha"}\nCategorias: Mercado, Restaurante, Farmácia, Padaria, Aluguel, Água/Luz/Gás, Internet/Telefone, Transporte, Saúde, Educação, Roupas, Lazer, Outros.\nPagamentos: Dinheiro, Cartão de crédito, Cartão de débito, PIX, Transferência.`;
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:[{parts:[
+          {inline_data:{mime_type:'image/jpeg',data:currentB64}},
+          {text: prompt}
+        ]}],
+        generationConfig:{temperature:0, maxOutputTokens:1000}
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    const txt = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const p = JSON.parse(txt.replace(/```json|```/g,'').trim());
+
+    document.getElementById('nota-resumo').textContent = p.resumo || 'Nota lida com sucesso.';
+    document.getElementById('n-desc').value  = p.estabelecimento || '';
+    document.getElementById('n-date').value  = /^\d{4}-\d{2}-\d{2}$/.test(p.data||'') ? p.data : new Date().toISOString().split('T')[0];
+    document.getElementById('n-total').value = p.total || '';
+
+    fillCats('n-cat', CATS_E);
+    if (p.categoria_sugerida && CATS_E.includes(p.categoria_sugerida)) document.getElementById('n-cat').value = p.categoria_sugerida;
+    const payEl = document.getElementById('n-pay');
+    if (p.forma_pagamento) [...payEl.options].forEach(o => { if(o.value===p.forma_pagamento) o.selected=true; });
+
+    notaItems = Array.isArray(p.itens) ? p.itens.filter(i=>i.desc) : [];
+    const iSec = document.getElementById('n-items-section');
+    if (notaItems.length) {
+      iSec.style.display = '';
+      document.getElementById('n-items-title').textContent = `Itens da nota (${notaItems.length})`;
+      document.getElementById('n-items-body').innerHTML = notaItems.map(i=>`
+        <div class="items-row">
+          <div class="desc">${i.desc}</div>
+          <div class="num">${i.qty}x</div>
+          <div class="num">${fmt(i.unit)}</div>
+          <div class="num total">${fmt(i.qty*i.unit)}</div>
+        </div>
+      `).join('');
+    } else { iSec.style.display = 'none'; }
+
+    const oSec = document.getElementById('n-obs-section');
+    if (p.observacoes) { oSec.style.display=''; document.getElementById('n-obs-text').textContent=p.observacoes; }
+    else oSec.style.display='none';
+
+    setNType('expense');
+    document.getElementById('nota-form-card').style.display = '';
+  } catch(e) {
+    alert('Erro ao ler nota: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✨ Ler com IA';
+  }
+}
+
+function saveNota() {
+  const desc  = document.getElementById('n-desc').value.trim();
+  const total = parseFloat(document.getElementById('n-total').value);
+  const date  = document.getElementById('n-date').value;
+  if (!desc||!total||!date) { showToast('Preencha descrição, valor e data'); return; }
+  txs.push({
+    id: Date.now().toString(), type: nType,
+    description: desc, amount: total, date,
+    category: document.getElementById('n-cat').value,
+    payment: document.getElementById('n-pay').value,
+    items: notaItems,
+    obs: document.getElementById('n-obs-text').textContent || ''
+  });
+  persist(); fillMonths(); resetNota();
+  showTab('painel'); showToast('✅ Lançamento salvo!');
+}
+
+function setNType(t) {
+  nType = t;
+  document.getElementById('nt-exp').className = 'type-opt exp'+(t==='expense'?' active':'');
+  document.getElementById('nt-inc').className = 'type-opt inc'+(t==='income'?' active':'');
+  fillCats('n-cat', t==='expense'?CATS_E:CATS_I);
+}
+
+// ============================================================
+// LANÇAR MANUAL
+// ============================================================
+function setLType(t) {
+  lType = t;
+  document.getElementById('lt-exp').className = 'type-opt exp'+(t==='expense'?' active':'');
+  document.getElementById('lt-inc').className = 'type-opt inc'+(t==='income'?' active':'');
+  fillCats('l-cat', t==='expense'?CATS_E:CATS_I);
+}
+
+function saveLancar() {
+  const desc = document.getElementById('l-desc').value.trim();
+  const amt  = parseFloat(document.getElementById('l-amt').value);
+  const date = document.getElementById('l-date').value;
+  if (!desc||!amt||!date) { showToast('Preencha todos os campos'); return; }
+  txs.push({
+    id: Date.now().toString(), type: lType,
+    description: desc, amount: amt, date,
+    category: document.getElementById('l-cat').value,
+    payment: document.getElementById('l-pay').value,
+    items: []
+  });
+  persist(); fillMonths();
+  document.getElementById('l-desc').value = '';
+  document.getElementById('l-amt').value  = '';
+  showTab('painel'); showToast('✅ Lançamento salvo!');
+}
+
+// ============================================================
+// HISTÓRICO
+// ============================================================
+function renderHistorico() {
+  const m  = document.getElementById('h-month').value;
+  const tp = document.getElementById('h-type').value;
+  let mt = txs.filter(t=>t.date.substring(0,7)===m);
+  if (tp) mt = mt.filter(t=>t.type===tp);
+  mt.sort((a,b)=>b.date.localeCompare(a.date));
+
+  const summary = document.getElementById('h-summary');
+  if (mt.length) {
+    const inc = mt.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+    const exp = mt.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+    summary.style.display = '';
+    summary.innerHTML = `<span class="summary-count">${mt.length} lançamentos</span>
+      <div class="summary-nums">
+        ${inc>0?`<span style="color:var(--green)">+${fmt(inc)}</span>`:''}
+        ${exp>0?`<span style="color:var(--red)">-${fmt(exp)}</span>`:''}
+      </div>`;
+  } else { summary.style.display='none'; }
+
+  const el = document.getElementById('h-list');
+  if (!mt.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">📭</span>Nenhum lançamento</div>';
+  } else {
+    el.innerHTML = '<div class="card" style="padding:8px 14px">'+mt.map(t=>txHTML(t,true)).join('')+'</div>';
+  }
+}
+
+// ============================================================
+// CONFIG
+// ============================================================
+function loadConfigScreen() {
+  const k = localStorage.getItem('mari_apikey') || '';
+  document.getElementById('cfg-apikey').value = k;
+  updateKeyHint(k);
+}
+document.getElementById('cfg-apikey').addEventListener('input', function() { updateKeyHint(this.value); });
+function updateKeyHint(v) {
+  const el = document.getElementById('cfg-key-hint');
+  if (!v) { el.textContent=''; return; }
+  if (v.startsWith('AIza')) el.textContent = '✅ Formato correto';
+  else el.textContent = '⚠️ Deve começar com AIza';
+}
+function saveApiKey() {
+  const k = document.getElementById('cfg-apikey').value.trim();
+  localStorage.setItem('mari_apikey', k);
+  const el = document.getElementById('cfg-saved');
+  el.style.display = '';
+  setTimeout(() => el.style.display='none', 3000);
+  showToast('✅ Chave da API salva!');
+}
+function exportCSV() {
+  if (!txs.length) { showToast('Nenhum lançamento para exportar'); return; }
+  const header = ['Data','Tipo','Descrição','Valor','Categoria','Pagamento'];
+  const rows = txs.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[
+    t.date, t.type==='income'?'Entrada':'Saída', t.description,
+    t.amount.toFixed(2).replace('.',','), t.category, t.payment
+  ]);
+  const csv = [header,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='financas-mariana.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 CSV baixado!');
+}
+function clearData() {
+  if (!confirm('Tem certeza? Isso apaga TODOS os lançamentos e não pode ser desfeito.')) return;
+  if (!confirm('Última confirmação — apagar tudo mesmo?')) return;
+  txs = []; persist(); fillMonths(); renderPainel();
+  showToast('Dados apagados');
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fillCats(selId, cats) {
+  const el = document.getElementById(selId);
+  el.innerHTML = cats.map(c=>`<option>${c}</option>`).join('');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  load();
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('l-date').value = today;
+  document.getElementById('n-date').value = today;
+  setLType('expense');
+  setNType('expense');
+  fillMonths();
+  renderPainel();
+}
+
+checkAuth();
+if (isLoggedIn()) init();
+</script>
+</body>
+</html>
